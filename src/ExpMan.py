@@ -6,7 +6,7 @@ class ExpMan():
     """
         Experiment Manager
     """
-    def __init__(self, main_algorithm, plan, dir_name='exp',log_path=None, **kwargs):
+    def __init__(self, main_algorithm, plan, dir_name='exp',log_path=None, batchman=None, **kwargs):
         self.main_algorithm = main_algorithm
         self.plan = plan
         self.dir_name = dir_name + '_'+str(datetime.now().strftime("%Y%m%d-%H:%M"))
@@ -20,6 +20,7 @@ class ExpMan():
         self.log_path = log_path
         self.kwargs = kwargs
         self._done = False
+        self.batchman = batchman
 
     def planning(self):
         if isinstance(self.plan, str):
@@ -41,7 +42,13 @@ class ExpMan():
             for config in self.plan:
                 log = '"start time":{}\n"configures":{}\n'.format(datetime.now(), config)
                 self.logging(log)
-                self.main_algorithm(**config)
+                if self.batchman is None:
+                    self.main_algorithm(**config)
+                else:
+                    config["bacthman"] = True
+                    config["experimetinfo_file"] = 'expinfo.csv'
+                    self.batchman.do_each_experiment(self.main_algorithm, **config)
+
                 self.logging('"end  time":{}\n'.format(datetime.now()))
 
         self._done = True
