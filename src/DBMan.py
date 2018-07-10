@@ -5,7 +5,7 @@ def _convert2type_of_sql(values):
     converted_types = []
     for v in values:
         if isinstance(v, np.int32):
-            converted_types.append('ineger')
+            converted_types.append('integer')
         elif isinstance(v, np.int64):
             converted_types.append('bigint')
         elif isinstance(v, np.float32):
@@ -15,7 +15,7 @@ def _convert2type_of_sql(values):
         elif isinstance(v, str):
             converted_types.append('text')
         elif isinstance(v, int):
-            converted_types.append('ineger')
+            converted_types.append('integer')
         elif isinstance(v, float):
             converted_types.append('double precision')
         else:
@@ -50,10 +50,12 @@ class DBMan():
 
     def set_storeinfo(self, result):
         assert isinstance(result, dict)
+        result = _flatten_dict(result)
         self.record_info["storage"] = result.values()
 
     def set_experimentinfo(self, plan):
         assert isinstance(plan, dict)
+        plan = _flatten_dict(plan)
         self.record_info["experiment"] = plan.values()
 
     def _parser_plan(self, plan):
@@ -64,7 +66,7 @@ class DBMan():
         types = _convert2type_of_sql(plan.values())
         return column, types
 
-    def _parser_result(self, result):]
+    def _parser_result(self, result):
         # TODO:
         column = result
         types = result
@@ -76,7 +78,7 @@ class DBMan():
         result, r_types = self._parser_plan(result)
         columns = plan + result
         types = p_types + r_types
-        columns_types = [" ".join(x, y) for x, y in zip(types,columns)]
+        columns_types = [" ".join([x, y]) for x, y in zip(columns, types)]
         columns_types = ",\n".join(columns_types)
         sql = """
             CREATE TABLE {schema}.{table_name}(
@@ -88,7 +90,7 @@ class DBMan():
         self._execute(sql)
 
     def record(self):
-        value = self.record_info["experiment"] + self.record_info["storage"]
+        value = list(self.record_info["experiment"]) + list(self.record_info["storage"])
         sql = """
             INSERT INTO {schema}.{table_name}
             VALUES {value}
@@ -103,6 +105,6 @@ class DBMan():
                         password=self.password,
                         host=self.host,
                         port=self.port) as conn:
-            curosr = conn.cursor()
-            curosr .execut(sql)
-            curosr.commit()
+            cursor = conn.cursor()
+            cursor.execute(sql)
+            conn.commit()

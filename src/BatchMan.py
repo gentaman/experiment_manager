@@ -7,7 +7,7 @@ class BatchMan():
     """
     def __init__(self, dbman, storageman=None, main_algorithm=None):
         self.dbman = dbman
-        self.storageman = dbman
+        self.storageman = storageman
         self.main_algorithm = main_algorithm
         self._first_process = True
 
@@ -43,7 +43,7 @@ class BatchMan():
         if self.storageman is None:
             self.dbman.set_storeinfo(result)
         else:
-            # TODO:
+            # TODO: 
             self.storageman.store_result(result)
 
 

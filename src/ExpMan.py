@@ -9,7 +9,7 @@ class ExpMan():
     def __init__(self, main_algorithm, plan, dir_name='exp',log_path=None, batchman=None, **kwargs):
         self.main_algorithm = main_algorithm
         self.plan = plan
-        self.dir_name = dir_name + '_'+str(datetime.now().strftime("%Y%m%d-%H%M"))
+        self.dir_name = dir_name + '_'+str(datetime.now().strftime("%Y%m%d_%H%M"))
         if not os.path.exists(self.dir_name):
             os.mkdir(self.dir_name)
 
@@ -45,7 +45,8 @@ class ExpMan():
                 if self.batchman is None:
                     self.main_algorithm(**plan)
                 else:
-                    plan["experimetinfo_file"] = '.expinfo.pkl'
+                    print(plan)
+                    plan["experimetinfo_file"] = ".expinfo.pkl"
                     self.batchman.do_each_experiment(
                         plan, self.main_algorithm, table_name=self.dir_name
                     )
@@ -72,5 +73,6 @@ class ExpMan():
             return False
 
     def check_key(self):
+        pass
         # TODO
         # key detect
