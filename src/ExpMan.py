@@ -39,15 +39,15 @@ class ExpMan():
             if not os.path.exists(self.dir_name):
                 os.mkdir(self.dir_name)
 
-            for config in self.plan:
+            for plan in self.plan:
                 log = '"start time":{}\n"configures":{}\n'.format(datetime.now(), config)
                 self.logging(log)
                 if self.batchman is None:
-                    self.main_algorithm(**config)
+                    self.main_algorithm(**plan)
                 else:
-                    config["bacthman"] = True
-                    config["experimetinfo_file"] = 'expinfo.csv'
-                    self.batchman.do_each_experiment(self.main_algorithm, **config)
+                    plan["bacthman"] = True
+                    plan["experimetinfo_file"] = 'expinfo.csv'
+                    self.batchman.do_each_experiment(plan, self.main_algorithm)
 
                 self.logging('"end  time":{}\n'.format(datetime.now()))
 
