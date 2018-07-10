@@ -53,7 +53,7 @@ def test_loop(configure, path, experimetinfo_file):
     result = {}
     result['acc'] = 1
     result['loss'] = -1
-    result['processed_time'] = e-s
+    result['processed_time'] = "{}".format(round(e-s))
     if not os.path.exists(path):
         os.makedirs(path)
     with open(path+'/'+experimetinfo_file, 'wb') as f:
