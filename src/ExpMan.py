@@ -45,10 +45,10 @@ class ExpMan():
                 if self.batchman is None:
                     self.main_algorithm(**plan)
                 else:
-                    plan["bacthman"] = True
-                    plan["experimetinfo_file"] = 'expinfo.csv'
-                    plan["dir_name"] = self.dir_name
-                    self.batchman.do_each_experiment(plan, self.main_algorithm)
+                    plan["experimetinfo_file"] = '.expinfo.pkl'
+                    self.batchman.do_each_experiment(
+                        plan, self.main_algorithm, table_name=self.dir_name
+                    )
 
                 self.logging('"end  time":{}\n'.format(datetime.now()))
 

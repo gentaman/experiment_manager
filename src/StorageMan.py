@@ -1,4 +1,4 @@
-# TODO: Implemente
+# TODO: Implement
 
 class StorageMan():
     """

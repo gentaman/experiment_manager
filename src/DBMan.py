@@ -3,18 +3,35 @@ import psycopg2 as ps
 import numpy as np
 def _convert2type_of_sql(values):
     converted_types = []
-    for t in values:
-        if isinstance(t, np.int32):
+    for v in values:
+        if isinstance(v, np.int32):
             converted_types.append('ineger')
-        elif isinstance(t, np.int64):
+        elif isinstance(v, np.int64):
             converted_types.append('bigint')
-        elif isinstance(t, np.float32):
+        elif isinstance(v, np.float32):
             converted_types.append('real')
-        elif isinstance(t, np.float64):
+        elif isinstance(v, np.float64):
             converted_types.append('double precision')
-        elif isinstance(t, str):
+        elif isinstance(v, str):
             converted_types.append('text')
+        elif isinstance(v, int):
+            converted_types.append('ineger')
+        elif isinstance(v, float):
+            converted_types.append('double precision')
+        else:
+            raise TypeError("undefined type:{}, value:{}".format(type(v), v))
+
     return converted_types
+
+def _flatten_dict(d, name=''):
+    assert isinstance(d, dict)
+    tmp = {}
+    for k in d:
+        if isinstance(d[k], dict):
+            tmp.update(_flatten_dict(d[k], k+'_'))
+        else:
+            tmp[name+k] = d[k]
+    return tmp
 
 class DBMan():
     """
@@ -29,6 +46,7 @@ class DBMan():
         self.db_info = db_info
         self.record_info = {}
         self.table_name = None
+        self.experiment_schema_name = "experiment"
 
     def set_storeinfo(self, result):
         assert isinstance(result, dict)
@@ -40,15 +58,6 @@ class DBMan():
 
     def _parser_plan(self, plan):
         assert isinstance(plan, dict)
-        def _flatten_dict(d, name=''):
-            assert isinstance(d, dict)
-            tmp = {}
-            for k in d:
-                if isinstance(d[k], dict):
-                    tmp.update(_flatten_dict(d[k], k+'_'))
-                else:
-                    tmp[name+k] = d[k]
-            return tmp
         plan = _flatten_dict(plan)
         column = list(plan)
         #types = list(map(type, plan.values()))
@@ -67,21 +76,25 @@ class DBMan():
         result, r_types = self._parser_plan(result)
         columns = plan + result
         types = p_types + r_types
-        columns_types = [" ".join(c, d) for c, d in zip(columns, types)]
+        columns_types = [" ".join(x, y) for x, y in zip(types,columns)]
         columns_types = ",\n".join(columns_types)
         sql = """
-            CREATE TABLE {table_name}(
+            CREATE TABLE {schema}.{table_name}(
                 {columns_types}
             )
-        """.format(table_name=self.table_name, columns_types=columns_types)
+        """.format(schema=self.experiment_schema_name,
+                   table_name=self.table_name,
+                   columns_types=columns_types)
         self._execute(sql)
 
     def record(self):
         value = self.record_info["experiment"] + self.record_info["storage"]
         sql = """
-            INSERT INTO {table_name}
+            INSERT INTO {schema}.{table_name}
             VALUES {value}
-        """.format(table_name=self.table_name, value=tuple(value))
+        """.format(schema=self.experiment_schema_name,
+                   table_name=self.table_name,
+                   value=tuple(value))
         self._execute(sql)
 
     def _execute(self, sql):
