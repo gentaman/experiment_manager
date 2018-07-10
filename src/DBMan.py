@@ -28,7 +28,7 @@ def _flatten_dict(d, name=''):
     tmp = {}
     for k in d:
         if isinstance(d[k], dict):
-            tmp.update(_flatten_dict(d[k], k+'_'))
+            tmp.update(_flatten_dict(d[k], name+'_'+k+'_'))
         else:
             tmp[name+k] = d[k]
     return tmp
@@ -47,22 +47,23 @@ class DBMan():
         self.record_info = {}
         self.table_name = None
         self.experiment_schema_name = "experiment"
+        self.connect()
 
     def set_storeinfo(self, result):
         assert isinstance(result, dict)
         result = _flatten_dict(result)
         self.record_info["storage"] = result.values()
 
-    def set_experimentinfo(self, plan):
-        assert isinstance(plan, dict)
-        plan = _flatten_dict(plan)
-        self.record_info["experiment"] = plan.values()
+    def set_experimentinfo(self, configure, path):
+        assert isinstance(configure, dict)
+        configure = _flatten_dict(configure)
+        self.record_info["experiment"] = list(configure.values())
+        self.record_info["experiment"] += [path]
 
     def _parser_plan(self, plan):
         assert isinstance(plan, dict)
         plan = _flatten_dict(plan)
         column = list(plan)
-        #types = list(map(type, plan.values()))
         types = _convert2type_of_sql(plan.values())
         return column, types
 
@@ -73,11 +74,13 @@ class DBMan():
         return columns, types
 
     def create_table(self, plan, result):
-        plan, p_types = self._parser_plan(plan)
+        configure, c_types = self._parser_plan(plan["configure"])
+        path = ["path"]
+        p_types = ["text"]
         # TODO:
         result, r_types = self._parser_plan(result)
-        columns = plan + result
-        types = p_types + r_types
+        columns = configure + path + result
+        types = c_types + p_types + r_types
         columns_types = [" ".join([x, y]) for x, y in zip(columns, types)]
         columns_types = ",\n".join(columns_types)
         sql = """
@@ -108,3 +111,12 @@ class DBMan():
             cursor = conn.cursor()
             cursor.execute(sql)
             conn.commit()
+
+    def connect(self):
+        with ps.connect(dbname=self.dbanme,
+                        user=self.user,
+                        password=self.password,
+                        host=self.host,
+                        port=self.port) as conn:
+            pass
+        print('connection succeed')

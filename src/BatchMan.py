@@ -29,12 +29,12 @@ class BatchMan():
             self._first_process = False
 
         self.store_result(result)
-        self.dbman.set_experimentinfo(plan)
+        self.dbman.set_experimentinfo(plan["configure"], plan["path"])
         self.dbman.record()
 
     def get_result(self, plan):
         path = plan["path"]
-        fname= plan["experimetinfo_file"]
+        fname = plan["experimetinfo_file"]
         with open(os.path.join(path, fname), mode='rb') as f:
             res = pk.load(f)
         return res
@@ -43,7 +43,7 @@ class BatchMan():
         if self.storageman is None:
             self.dbman.set_storeinfo(result)
         else:
-            # TODO: 
+            # TODO:
             self.storageman.store_result(result)
 
 
