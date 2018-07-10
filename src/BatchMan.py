@@ -8,6 +8,7 @@ class BatchMan():
         self.dbman = dbman
         self.storageman = dbman
         self.main_algorithm = main_algorithm
+        self._first_process = True
 
     def setup(self):
         pass
@@ -21,6 +22,11 @@ class BatchMan():
         else:
             self.main_algorithm(**plan)
         result = self.get_result(plan)
+        if self._first_process:
+            self.dbman.table_name = plan["dir_name"]
+            self.dbman.create_table(plan, result)
+            self._first_process = False
+        
         self.store_result(result)
         self.dbman.set_experimentinfo(plan)
         self.dbman.record()

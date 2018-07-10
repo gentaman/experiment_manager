@@ -9,7 +9,7 @@ class ExpMan():
     def __init__(self, main_algorithm, plan, dir_name='exp',log_path=None, batchman=None, **kwargs):
         self.main_algorithm = main_algorithm
         self.plan = plan
-        self.dir_name = dir_name + '_'+str(datetime.now().strftime("%Y%m%d-%H:%M"))
+        self.dir_name = dir_name + '_'+str(datetime.now().strftime("%Y%m%d-%H%M"))
         if not os.path.exists(self.dir_name):
             os.mkdir(self.dir_name)
 
@@ -47,6 +47,7 @@ class ExpMan():
                 else:
                     plan["bacthman"] = True
                     plan["experimetinfo_file"] = 'expinfo.csv'
+                    plan["dir_name"] = self.dir_name
                     self.batchman.do_each_experiment(plan, self.main_algorithm)
 
                 self.logging('"end  time":{}\n'.format(datetime.now()))
