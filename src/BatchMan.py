@@ -12,22 +12,22 @@ class BatchMan():
     def setup(self):
         pass
 
-    def do_experiment(self, main_algorithm, config):
+    def do_experiment(self, main_algorithm, plan):
         pass
 
-    def do_each_experiment(self, config, main_algorithm=None):
+    def do_each_experiment(self, plan, main_algorithm=None):
         if main_algorithm is not None:
-            main_algorithm(**config)
+            main_algorithm(**plan)
         else:
-            self.main_algorithm(**config)
-        result = self.get_result(config)
+            self.main_algorithm(**plan)
+        result = self.get_result(plan)
         self.store_result(result)
-        self.dbman.set_experimentinfo(config)
+        self.dbman.set_experimentinfo(plan)
         self.dbman.record()
 
-    def get_result(self, config):
-        path = config["path"]
-        fname= config["experimetinfo_file"]
+    def get_result(self, plan):
+        path = plan["path"]
+        fname= plan["experimetinfo_file"]
         with open(os.path.join(path, fname)) as f:
             res = f.read()
         return res
@@ -40,5 +40,5 @@ class BatchMan():
             self.storageman.store_result(result)
 
 
-    def record(self, config):
+    def record(self, plan):
         pass

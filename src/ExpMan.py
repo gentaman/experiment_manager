@@ -40,7 +40,7 @@ class ExpMan():
                 os.mkdir(self.dir_name)
 
             for plan in self.plan:
-                log = '"start time":{}\n"configures":{}\n'.format(datetime.now(), config)
+                log = '"start time":{}\n"plan":{}\n'.format(datetime.now(), plan)
                 self.logging(log)
                 if self.batchman is None:
                     self.main_algorithm(**plan)
