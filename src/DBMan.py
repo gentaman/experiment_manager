@@ -17,7 +17,7 @@ def _convert2type_of_sql(values):
         elif isinstance(v, int):
             converted_types.append('integer')
         elif isinstance(v, float):
-            converted_types.append('double precision')
+            converted_types.append('real')
         else:
             raise TypeError("undefined type:{}, value:{}".format(type(v), v))
 
