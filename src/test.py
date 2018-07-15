@@ -1,6 +1,6 @@
-from ExpMan import ExpMan
-from BatchMan import BatchMan
-from DBMan import DBMan
+from experiment_manager import ExpMan
+from experiment_manager import BatchMan
+from experiment_manager import DBMan
 #from StorageMan import StorageMan
 
 from getpass import getpass
