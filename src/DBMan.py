@@ -37,7 +37,7 @@ class DBMan():
     """
         Database Manager
     """
-    def __init__(self, db_info):
+    def __init__(self, db_info, automatic_execution=True):
         self.dbanme = db_info["dbname"]
         self.user = db_info["user"]
         self.password = db_info["password"]
@@ -47,6 +47,7 @@ class DBMan():
         self.record_info = {}
         self.table_name = None
         self.experiment_schema_name = "experiment"
+        self.automatic_execution = automatic_execution
         self.connect()
 
     def set_storeinfo(self, result):
@@ -103,20 +104,24 @@ class DBMan():
         self._execute(sql)
 
     def _execute(self, sql):
-        with ps.connect(dbname=self.dbanme,
-                        user=self.user,
-                        password=self.password,
-                        host=self.host,
-                        port=self.port) as conn:
-            cursor = conn.cursor()
-            cursor.execute(sql)
-            conn.commit()
+        with open(self.table_name + '.sql', 'a') as f:
+            f.write(sql)
+        if self.automatic_execution:
+            with ps.connect(dbname=self.dbanme,
+                            user=self.user,
+                            password=self.password,
+                            host=self.host,
+                            port=self.port) as conn:
+                cursor = conn.cursor()
+                cursor.execute(sql)
+                conn.commit()
 
     def connect(self):
-        with ps.connect(dbname=self.dbanme,
-                        user=self.user,
-                        password=self.password,
-                        host=self.host,
-                        port=self.port) as conn:
-            pass
-        print('connection succeed')
+        if self.automatic_execution:
+            with ps.connect(dbname=self.dbanme,
+                            user=self.user,
+                            password=self.password,
+                            host=self.host,
+                            port=self.port) as conn:
+                pass
+            print('connection succeed')
